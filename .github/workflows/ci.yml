@@ -172,6 +172,7 @@ jobs:
           --username ${{ secrets.AZURE_REGISTRY_USERNAME }} \
           --password ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
+
     - name: Create and Sync Argo CD Application
       run: |
         # Create the application using Helm chart from registry
