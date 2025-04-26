@@ -121,7 +121,10 @@ jobs:
         password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
     - name: Login to Helm OCI Registry
-      run: helm registry login ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io
+      run: |
+        helm registry login ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io \
+          --username ${{ secrets.AZURE_REGISTRY_USERNAME }} \
+          --password ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
     - name: Push Helm charts to ACR OCI registry
       run: |
