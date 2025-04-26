@@ -1,57 +1,99 @@
-name: Continuous Integration
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: [ main ]
   pull_request:
-    branches: [ "main", "develop" ]
+    branches: [ main ]
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v3
       with:
-        fetch-depth: 0  # Shallow clones should be disabled for better SonarQube analysis
-    
+        fetch-depth: 0
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 7.0.x
-    
+        dotnet-version: 8.0.x
+
     - name: Restore dependencies
       run: dotnet restore SemanixBackend/SemanixBackend.sln
-    
+
     - name: Build
-      run: dotnet build SemanixBackend/SemanixBackend.sln --no-restore --configuration Release
-    
+      run: dotnet build SemanixBackend/SemanixBackend.sln --configuration Release --no-restore
+
     - name: Test
-      run: dotnet test SemanixBackend/SemanixBackend.sln --no-build --verbosity normal
-      
-    - name: SonarCloud Scan
+      run: dotnet test SemanixBackend/SemanixBackend.sln --configuration Release --no-build
+
+    - name: SonarQube Scan
       uses: SonarSource/sonarcloud-github-action@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       with:
         args: >
-          -Dsonar.projectKey=semanix_backend
-          -Dsonar.organization=your-organization
-          
-    - name: Build and push Docker image
+          -Dsonar.projectKey=semantixbackend
+          -Dsonar.organization=semantixbackend
+
+  build-and-push-docker:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Login to Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ secrets.REGISTRY_URL }}
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+
+    - name: Build and push AccessManagement API
       uses: docker/build-push-action@v4
       with:
         context: ./SemanixBackend
-        push: ${{ github.event_name != 'pull_request' }}
-        tags: |
-          your-registry/semanix-backend:latest
-          your-registry/semanix-backend:${{ github.sha }}
-        
-    - name: Send Teams notification
-      uses: aliencube/microsoft-teams-actions@v0.8.0
+        file: ./SemanixBackend/src/Services/AccessManagement/AccessManagement.Api/Dockerfile
+        push: true
+        tags: ${{ secrets.REGISTRY_URL }}/accessmanagementapi:latest
+
+    - name: Build and push RequestManagement API
+      uses: docker/build-push-action@v4
       with:
-        webhook_uri: ${{ secrets.TEAMS_WEBHOOK }}
-        title: "Build Status"
-        message: "Build for commit ${{ github.sha }} completed"
-        theme_color: ${{ job.status == 'success' && '00FF00' || 'FF0000' }} 
+        context: ./SemanixBackend
+        file: ./SemanixBackend/src/Services/RequestManagement/RequestManagement.Api/Dockerfile
+        push: true
+        tags: ${{ secrets.REGISTRY_URL }}/requestmanagementapi:latest
+
+    - name: Scan Docker Images for vulnerabilities
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: ${{ secrets.REGISTRY_URL }}/accessmanagementapi:latest
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+  update-helm-charts:
+    needs: build-and-push-docker
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Package Helm charts
+      run: |
+        helm package ./deployment/helm/charts/accessmanagement -d ./deployment/helm/releases
+        helm package ./deployment/helm/charts/requestmanagement -d ./deployment/helm/releases
+
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add ./deploy/helm/releases
+        git commit -m "Update Helm charts" || echo "No changes to commit"
+        git push 

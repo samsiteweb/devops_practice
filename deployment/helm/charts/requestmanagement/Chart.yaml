@@ -1,0 +1,6 @@
+apiVersion: v2
+name: requestmanagement
+description: A Helm chart for RequestManagement microservice
+type: application
+version: 0.1.0
+appVersion: "1.0.0" 
