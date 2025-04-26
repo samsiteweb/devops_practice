@@ -163,17 +163,26 @@ jobs:
       run: |
         sudo argocd login ${{ secrets.ARGOCD_SERVER }} --username ${{ secrets.ARGOCD_USER }} --password ${{ secrets.ARGOCD_PASSWORD }} --insecure
 
+    - name: Add Helm Repository to ArgoCD
+      run: |
+        sudo argocd repo add ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/helm \
+          --type helm \
+          --name azure-helm \
+          --enable-oci \
+          --username ${{ secrets.AZURE_REGISTRY_USERNAME }} \
+          --password ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+
     - name: Create and Sync Argo CD Application
       run: |
-        # Create the application using Helm chart OCI registry instead of Git
+        # Create the application using Helm chart from registry
         sudo argocd app create semanix-backend \
-          --repo oci://${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/helm \
+          --repo ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/helm \
           --helm-chart accessmanagement \
           --revision 0.1.0 \
           --dest-server https://kubernetes.default.svc \
           --dest-namespace semanix \
-          --upsert || echo "Failed to create/update application"
+          --upsert
         
         # Sync the application after creating it
-        sudo argocd app sync semanix-backend || echo "Failed to sync application"
-        sudo argocd app wait semanix-backend --health --timeout 120s || echo "Failed to wait for application"
+        sudo argocd app sync semanix-backend
+        sudo argocd app wait semanix-backend --health --timeout 120
