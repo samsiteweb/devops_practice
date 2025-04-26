@@ -79,6 +79,7 @@ spec:
           value: "root"
         - name: VAULT_DEV_LISTEN_ADDRESS
           value: "0.0.0.0:8200"
-        capabilities:
-          add:
+        securityContext:
+          capabilities:
+            add:
             - IPC_LOCK 
