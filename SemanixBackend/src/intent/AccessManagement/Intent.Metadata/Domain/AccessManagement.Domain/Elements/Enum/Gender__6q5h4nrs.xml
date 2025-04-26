@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<class id="b87a2a61-edc7-406e-a0b6-d1d5206e57ae" type="Enum" typeId="85fba0e9-9161-4c85-a603-a229ef312beb">
+  <name>Gender</name>
+  <display>Gender</display>
+  <isAbstract>false</isAbstract>
+  <sort-children>by-type-then-manually</sort-children>
+  <genericTypes />
+  <isMapped>false</isMapped>
+  <parentFolderId>e279f089-7f8c-4e6a-a469-b943d95a9be2</parentFolderId>
+  <packageId>e279f089-7f8c-4e6a-a469-b943d95a9be2</packageId>
+  <packageName>AccessManagement.Domain</packageName>
+  <stereotypes />
+  <metadata />
+  <childElements>
+    <childElement id="08b0e48a-e605-405b-affe-e8528e5155a7" type="Enum-Literal" typeId="4215f417-25d2-4509-9309-5076a1452eaa">
+      <name>Male</name>
+      <display>Male</display>
+      <isAbstract>false</isAbstract>
+      <genericTypes />
+      <isMapped>false</isMapped>
+      <parentFolderId>b87a2a61-edc7-406e-a0b6-d1d5206e57ae</parentFolderId>
+      <packageId>e279f089-7f8c-4e6a-a469-b943d95a9be2</packageId>
+      <packageName>AccessManagement.Domain</packageName>
+      <stereotypes />
+      <metadata />
+      <childElements />
+    </childElement>
+    <childElement id="ca30f04e-c3a1-46a7-9d3d-d17a93f55b9e" type="Enum-Literal" typeId="4215f417-25d2-4509-9309-5076a1452eaa">
+      <name>Female</name>
+      <display>Female</display>
+      <isAbstract>false</isAbstract>
+      <genericTypes />
+      <isMapped>false</isMapped>
+      <parentFolderId>b87a2a61-edc7-406e-a0b6-d1d5206e57ae</parentFolderId>
+      <packageId>e279f089-7f8c-4e6a-a469-b943d95a9be2</packageId>
+      <packageName>AccessManagement.Domain</packageName>
+      <stereotypes />
+      <metadata />
+      <childElements />
+    </childElement>
+  </childElements>
+</class>

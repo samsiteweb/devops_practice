@@ -1,0 +1,6 @@
+services:
+  accessmanagement.api:
+    image: ${DOCKER_REGISTRY-}accessmanagementapi
+    build:
+      context: .
+      dockerfile: src/Services/AccessManagement/AccessManagement.Api/Dockerfile

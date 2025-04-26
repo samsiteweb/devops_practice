@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<class id="928e0dcd-d35a-47f8-84d9-85b27a775a4a" type="Diagram" typeId="4d66fecd-e9b8-436f-aa50-c59040ad0879">
+  <name>Default Diagram</name>
+  <display>Default Diagram</display>
+  <externalReference>a899c575-0c95-4d87-9683-bee962acdec8</externalReference>
+  <isAbstract>false</isAbstract>
+  <genericTypes />
+  <isMapped>false</isMapped>
+  <parentFolderId>e279f089-7f8c-4e6a-a469-b943d95a9be2</parentFolderId>
+  <packageId>e279f089-7f8c-4e6a-a469-b943d95a9be2</packageId>
+  <packageName>AccessManagement.Domain</packageName>
+  <diagram>
+    <targetPackageId>e279f089-7f8c-4e6a-a469-b943d95a9be2</targetPackageId>
+  </diagram>
+  <stereotypes />
+  <metadata />
+  <childElements />
+</class>

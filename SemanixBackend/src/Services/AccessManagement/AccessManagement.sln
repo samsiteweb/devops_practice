@@ -1,0 +1,68 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 17
+VisualStudioVersion = 17.8.34322.80
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0 - Solution Items", "0 - Solution Items", "{32206C02-816C-4BB4-A524-7201D0FF2356}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dapr", "dapr", "{E45BC719-4D2D-4206-AE78-87048CDE2CF7}"
+	ProjectSection(SolutionItems) = preProject
+		dapr\config.yaml = dapr\config.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "components", "components", "{F1F91D14-040D-4E7D-88EC-0691DAB89F5B}"
+	ProjectSection(SolutionItems) = preProject
+		dapr\components\pubsub.yaml = dapr\components\pubsub.yaml
+		dapr\components\statestore.yaml = dapr\components\statestore.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1 - Api", "1 - Api", "{41F06394-4CA1-42D4-82FA-3940DBD3556B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessManagement.Api", "AccessManagement.Api\AccessManagement.Api.csproj", "{21F893A1-27B5-44EA-86FA-15DF898DBA03}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2 - Application", "2 - Application", "{5DFCCAFC-4B96-4F36-BD01-841A365F5176}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessManagement.Application", "AccessManagement.Application\AccessManagement.Application.csproj", "{C21DBEF6-1215-4601-A7A9-9F8DE2C9277B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3 - Domain", "3 - Domain", "{83134CFE-7D6C-4AC4-A786-A38B3FD5C663}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessManagement.Domain", "AccessManagement.Domain\AccessManagement.Domain.csproj", "{BE624800-60D0-4434-8F47-8068E0E930D1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4 - Infrastructure", "4 - Infrastructure", "{DEFFE30E-DB48-45E4-AAAF-953E94945DA6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccessManagement.Infrastructure", "AccessManagement.Infrastructure\AccessManagement.Infrastructure.csproj", "{D9F5E358-1DFC-4538-8CD1-E334FA85FFA1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E45BC719-4D2D-4206-AE78-87048CDE2CF7} = {32206C02-816C-4BB4-A524-7201D0FF2356}
+		{F1F91D14-040D-4E7D-88EC-0691DAB89F5B} = {E45BC719-4D2D-4206-AE78-87048CDE2CF7}
+		{21F893A1-27B5-44EA-86FA-15DF898DBA03} = {41F06394-4CA1-42D4-82FA-3940DBD3556B}
+		{C21DBEF6-1215-4601-A7A9-9F8DE2C9277B} = {5DFCCAFC-4B96-4F36-BD01-841A365F5176}
+		{BE624800-60D0-4434-8F47-8068E0E930D1} = {83134CFE-7D6C-4AC4-A786-A38B3FD5C663}
+		{D9F5E358-1DFC-4538-8CD1-E334FA85FFA1} = {DEFFE30E-DB48-45E4-AAAF-953E94945DA6}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{21F893A1-27B5-44EA-86FA-15DF898DBA03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21F893A1-27B5-44EA-86FA-15DF898DBA03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21F893A1-27B5-44EA-86FA-15DF898DBA03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21F893A1-27B5-44EA-86FA-15DF898DBA03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C21DBEF6-1215-4601-A7A9-9F8DE2C9277B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C21DBEF6-1215-4601-A7A9-9F8DE2C9277B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C21DBEF6-1215-4601-A7A9-9F8DE2C9277B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C21DBEF6-1215-4601-A7A9-9F8DE2C9277B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE624800-60D0-4434-8F47-8068E0E930D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE624800-60D0-4434-8F47-8068E0E930D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE624800-60D0-4434-8F47-8068E0E930D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE624800-60D0-4434-8F47-8068E0E930D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9F5E358-1DFC-4538-8CD1-E334FA85FFA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9F5E358-1DFC-4538-8CD1-E334FA85FFA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9F5E358-1DFC-4538-8CD1-E334FA85FFA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9F5E358-1DFC-4538-8CD1-E334FA85FFA1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

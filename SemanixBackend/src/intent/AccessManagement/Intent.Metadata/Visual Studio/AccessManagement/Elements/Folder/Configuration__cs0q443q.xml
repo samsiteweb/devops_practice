@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<class id="228e5faa-ff75-4a98-9bb8-002c16e42fb2" type="Folder" typeId="3407a825-1331-4f3f-89a4-901903ed97ce">
+  <name>Configuration</name>
+  <display>Configuration</display>
+  <isAbstract>false</isAbstract>
+  <genericTypes />
+  <isMapped>false</isMapped>
+  <parentFolderId>d9f5e358-1dfc-4538-8cd1-e334fa85ffa1</parentFolderId>
+  <stereotypes />
+  <metadata />
+  <childElements>
+    <childElement id="5b4837b9-cbd9-44e8-a319-f088d35139fd" type="Template Output" typeId="d421c322-7a51-4094-89fa-e5d8a0a97b27">
+      <name>Intent.Dapr.AspNetCore.ServiceInvocation.HttpClientConfigurationTemplate</name>
+      <display>Intent.Dapr.AspNetCore.ServiceInvocation.HttpClientConfigurationTemplate</display>
+      <externalReference>Intent.Dapr.AspNetCore.ServiceInvocation</externalReference>
+      <isAbstract>false</isAbstract>
+      <genericTypes />
+      <isMapped>false</isMapped>
+      <parentFolderId>228e5faa-ff75-4a98-9bb8-002c16e42fb2</parentFolderId>
+      <stereotypes />
+      <metadata>
+        <entry key="status" value="assigned" />
+      </metadata>
+      <childElements />
+    </childElement>
+  </childElements>
+</class>
