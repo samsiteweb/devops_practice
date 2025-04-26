@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: {{secrets.AZURE_REGISTRY_NAME}}.azurecr.io/accessmanagementapi
+  repository: ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/accessmanagementapi
   pullPolicy: IfNotPresent
   tag: "latest"
 

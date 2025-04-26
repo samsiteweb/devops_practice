@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: {{secrets.AZURE_REGISTRY_NAME}}.azurecr.io/requestmanagementapi
+  repository: ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/requestmanagementapi
   pullPolicy: IfNotPresent
   tag: "latest"
 
