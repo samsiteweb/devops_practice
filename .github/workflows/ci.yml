@@ -142,7 +142,7 @@ jobs:
 
     - name: Create Service Accounts
       run: |
-        kubectl apply -f ./deploy/k8s/service-accounts.yaml
+        microk8s kubectl apply -f ./deploy/k8s/service-accounts.yaml
 
     - name: Add Helm Repository to ArgoCD
       run: |
