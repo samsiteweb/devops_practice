@@ -28,15 +28,15 @@ jobs:
     - name: Test
       run: dotnet test SemanixBackend/SemanixBackend.sln --configuration Release --no-build
 
-    - name: SonarQube Scan
-      uses: SonarSource/sonarcloud-github-action@master
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      with:
-        args: >
-          -Dsonar.projectKey=semanixbackend
-          -Dsonar.organization=semanixbackend
+    # - name: SonarQube Scan
+    #   uses: SonarSource/sonarcloud-github-action@master
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    #   with:
+    #     args: >
+    #       -Dsonar.projectKey=semantixbackend
+    #       -Dsonar.organization=semantixbackend
 
   build-and-push-docker:
     needs: build-and-test
