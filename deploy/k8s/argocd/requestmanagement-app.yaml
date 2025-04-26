@@ -3,6 +3,7 @@ kind: Application
 metadata:
   name: semanix-backend-requestmanagement
   namespace: argocd
+  
 spec:
   project: default
   source:
@@ -21,7 +22,7 @@ spec:
           value: samthedonz.azurecr.io/requestmanagementapi
         - name: image.tag
           value: latest
-          
+
   destination:
     server: https://kubernetes.default.svc
     namespace: semanix
