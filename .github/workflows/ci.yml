@@ -110,11 +110,11 @@ jobs:
 
     - name: Package Helm charts
       run: |
-        helm package ./helm/charts/accessmanagement -d ./helm/releases
-        helm package ./helm/charts/requestmanagement -d ./helm/releases
+        helm package ./deploy/helm/charts/accessmanagement -d ./deploy/helm/releases
+        helm package ./deploy/helm/charts/requestmanagement -d ./deploy/helm/releases
         az acr login --name ${{ secrets.AZURE_REGISTRY_NAME }}
-        helm push ./helm/releases/accessmanagement-*.tgz oci://
-        helm push ./helm/releases/requestmanagement-*.tgz oci://
+        helm push ./deploy/helm/releases/accessmanagement-*.tgz oci://
+        helm push ./deploy/helm/releases/requestmanagement-*.tgz oci://
 
     - name: Commit and push changes
       run: |
