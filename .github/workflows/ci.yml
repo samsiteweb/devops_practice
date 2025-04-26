@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, azure]
     steps:
     - uses: actions/checkout@v3
       with:
@@ -40,7 +40,7 @@ jobs:
 
   build-and-push-docker:
     needs: build-and-test
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, azure]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
     - uses: actions/checkout@v3
@@ -82,7 +82,7 @@ jobs:
 
   update-helm-charts:
     needs: build-and-push-docker
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, azure]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
     - uses: actions/checkout@v3
@@ -105,7 +105,7 @@ jobs:
 
   sync-argocd:
     needs: update-helm-charts
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, azure]
     steps:
     - name: Install Argo CD CLI
       run: |

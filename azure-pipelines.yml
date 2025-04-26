@@ -1,0 +1,101 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  name: 'Default'  # Change to your self-hosted pool name
+  demands:
+    - agent.os -equals Linux
+
+variables:
+  Configuration: 'Release'
+  ACR_NAME: '$(AZURE_REGISTRY_NAME)'
+  ARGOCD_APP: 'semanix-backend'
+  NAMESPACE: 'semanix'
+
+stages:
+- stage: Build_Test_Scan
+  displayName: Build, Test & SonarQube
+  jobs:
+  - job: Build
+    displayName: .NET Build & Test
+    steps:
+    - task: UseDotNet@2
+      inputs:
+        packageType: 'sdk'
+        version: '8.0.x'
+    - script: dotnet restore SemanixBackend/SemanixBackend.sln
+      displayName: Restore dependencies
+    - script: dotnet build SemanixBackend/SemanixBackend.sln --configuration $(Configuration) --no-restore
+      displayName: Build
+    - script: dotnet test SemanixBackend/SemanixBackend.sln --configuration $(Configuration) --no-build
+      displayName: Test
+    - task: SonarCloudPrepare@1
+      inputs:
+        SonarCloud: 'SonarCloud'
+        organization: '$(SonarOrganization)'
+        scannerMode: 'CLI'
+        configMode: 'manual'
+        cliProjectKey: 'semantixbackend'
+        cliProjectName: 'SemanixBackend'
+    - script: dotnet build SemanixBackend/SemanixBackend.sln
+      displayName: Build for SonarQube
+    - task: SonarCloudAnalyze@1
+    - task: SonarCloudPublish@1
+
+- stage: Docker_Build_Push
+  displayName: Docker Build & Push
+  dependsOn: Build_Test_Scan
+  condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+  jobs:
+  - job: Docker
+    displayName: Build & Push to ACR
+    steps:
+    - task: Docker@2
+      inputs:
+        command: buildAndPush
+        repository: $(ACR_NAME).azurecr.io/accessmanagementapi
+        dockerfile: SemanixBackend/src/Services/AccessManagement/AccessManagement.Api/Dockerfile
+        tags: latest
+    - task: Docker@2
+      inputs:
+        command: buildAndPush
+        repository: $(ACR_NAME).azurecr.io/requestmanagementapi
+        dockerfile: SemanixBackend/src/Services/RequestManagement/RequestManagement.Api/Dockerfile
+        tags: latest
+
+- stage: Package_Helm
+  displayName: Package Helm Charts
+  dependsOn: Docker_Build_Push
+  jobs:
+  - job: Helm
+    displayName: Package & Push Charts
+    steps:
+    - script: |
+        helm package deploy/helm/charts/accessmanagement -d deploy/helm/releases
+        helm package deploy/helm/charts/requestmanagement -d deploy/helm/releases
+      displayName: Package Helm Charts
+    - task: AzureCLI@2
+      inputs:
+        azureSubscription: '$(AzureServiceConnection)'
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          az acr login --name $(ACR_NAME)
+          helm registry login $(ACR_NAME).azurecr.io
+          helm push deploy/helm/releases/accessmanagement-*.tgz oci://$(ACR_NAME).azurecr.io/helm
+          helm push deploy/helm/releases/requestmanagement-*.tgz oci://$(ACR_NAME).azurecr.io/helm
+
+- stage: Deploy_ArgoCD
+  displayName: Sync Argo CD
+  dependsOn: Package_Helm
+  jobs:
+  - job: ArgoSync
+    displayName: Argo CD Sync
+    steps:
+    - script: |
+        argocd login $(ARGOCD_SERVER) --username $(ARGOCD_USER) --password $(ARGOCD_PASSWORD) --insecure
+        argocd app sync $(ARGOCD_APP)
+        argocd app wait $(ARGOCD_APP) --health --timeout 120s
+      displayName: Sync Argo CD Application 
