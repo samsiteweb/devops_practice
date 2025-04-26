@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: ${AZURE_REGISTRY_NAME}.azurecr.io/helm
+    repoURL: samthedonz.azurecr.io/helm
     targetRevision: 0.1.0
     chart: accessmanagement
     helm:
@@ -17,9 +17,10 @@ spec:
           value: "false"
         - name: serviceAccount.name
           value: "semanix-backend-accessmanagement"
-      image:
-             repository: samthedonz.azurecr.io/accessmanagementapi
-             tag: latest
+        - name: image.repository
+          value: samthedonz.azurecr.io/accessmanagementapi
+        - name: image.tag
+          value: latest
   destination:
     server: https://kubernetes.default.svc
     namespace: semanix
