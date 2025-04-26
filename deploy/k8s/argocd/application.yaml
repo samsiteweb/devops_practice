@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/your-org/devops_practice.git
+    repoURL: https://github.com/samsiteweb/devops_practice.git
     targetRevision: HEAD
     path: helm/charts
   destination:
