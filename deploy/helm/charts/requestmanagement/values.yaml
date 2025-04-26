@@ -20,7 +20,7 @@ podSecurityContext: {}
 securityContext: {}
 
 service:
-  type: ClusterIP
+  type: NodePort
   port: 8090
 
 ingress:
@@ -61,4 +61,4 @@ env:
     value: "http://+:8090" 
 
 imagePullSecrets:
-  - name: acr-auth
+  - name: acr-pull-secret
