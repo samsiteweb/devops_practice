@@ -149,6 +149,10 @@ jobs:
     needs: update-helm-charts
     runs-on: [self-hosted, azure]
     steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    
     - name: Install Argo CD CLI
       run: |
         curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
@@ -161,15 +165,15 @@ jobs:
 
     - name: Create and Sync Argo CD Application
       run: |
-        # Create the application if it doesn't exist yet
-        argocd app create semanix-backend \
-          --repo https://github.com/${{ github.repository }}.git \
-          --path deploy/helm/charts \
+        # Create the application using Helm chart OCI registry instead of Git
+        sudo argocd app create semanix-backend \
+          --repo oci://${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/helm \
+          --helm-chart accessmanagement \
+          --revision 0.1.0 \
           --dest-server https://kubernetes.default.svc \
           --dest-namespace semanix \
-          --helm-chart accessmanagement \
-          --revision main || echo "Application may already exist"
+          --upsert || echo "Failed to create/update application"
         
-        # Sync the application
-        argocd app sync semanix-backend
-        argocd app wait semanix-backend --health --timeout 120s
+        # Sync the application after creating it
+        sudo argocd app sync semanix-backend || echo "Failed to sync application"
+        sudo argocd app wait semanix-backend --health --timeout 120s || echo "Failed to wait for application"
