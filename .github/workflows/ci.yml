@@ -157,9 +157,19 @@ jobs:
 
     - name: Argo CD Login
       run: |
-        argocd login ${{ secrets.ARGOCD_SERVER }} --username ${{ secrets.ARGOCD_USER }} --password ${{ secrets.ARGOCD_PASSWORD }} --insecure
+        sudo argocd login ${{ secrets.ARGOCD_SERVER }} --username ${{ secrets.ARGOCD_USER }} --password ${{ secrets.ARGOCD_PASSWORD }} --insecure
 
-    - name: Sync Argo CD Application
+    - name: Create and Sync Argo CD Application
       run: |
+        # Create the application if it doesn't exist yet
+        argocd app create semanix-backend \
+          --repo https://github.com/${{ github.repository }}.git \
+          --path deploy/helm/charts \
+          --dest-server https://kubernetes.default.svc \
+          --dest-namespace semanix \
+          --helm-chart accessmanagement \
+          --revision main || echo "Application may already exist"
+        
+        # Sync the application
         argocd app sync semanix-backend
         argocd app wait semanix-backend --health --timeout 120s
