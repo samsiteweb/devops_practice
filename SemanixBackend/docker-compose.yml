@@ -4,3 +4,9 @@ services:
     build:
       context: .
       dockerfile: src/Services/AccessManagement/AccessManagement.Api/Dockerfile
+
+  requestmanagement.api:
+    image: ${DOCKER_REGISTRY-}requestmanagementapi
+    build:
+      context: .
+      dockerfile: src/Services/RequestManagement/RequestManagement.Api/Dockerfile

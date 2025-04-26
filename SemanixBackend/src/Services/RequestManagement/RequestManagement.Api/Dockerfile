@@ -11,21 +11,21 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["RequestManagement.Api.csproj", "./"]
-COPY ["../RequestManagement.Application/RequestManagement.Application.csproj", "../RequestManagement.Application/"]
-COPY ["../RequestManagement.Domain/RequestManagement.Domain.csproj", "../RequestManagement.Domain/"]
-COPY ["../RequestManagement.Infrastructure/RequestManagement.Infrastructure.csproj", "../RequestManagement.Infrastructure/"]
-RUN dotnet restore "./RequestManagement.Api.csproj"
-COPY . .
-COPY ["../RequestManagement.Application/", "../RequestManagement.Application/"]
-COPY ["../RequestManagement.Domain/", "../RequestManagement.Domain/"]
-COPY ["../RequestManagement.Infrastructure/", "../RequestManagement.Infrastructure/"]
-RUN dotnet build "RequestManagement.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
+COPY ["src/Services/RequestManagement/RequestManagement.Api/RequestManagement.Api.csproj", "src/Services/RequestManagement/RequestManagement.Api/"]
+COPY ["src/Services/RequestManagement/RequestManagement.Application/RequestManagement.Application.csproj", "src/Services/RequestManagement/RequestManagement.Application/"]
+COPY ["src/Services/RequestManagement/RequestManagement.Domain/RequestManagement.Domain.csproj", "src/Services/RequestManagement/RequestManagement.Domain/"]
+COPY ["src/Services/RequestManagement/RequestManagement.Infrastructure/RequestManagement.Infrastructure.csproj", "src/Services/RequestManagement/RequestManagement.Infrastructure/"]
+RUN dotnet restore "src/Services/RequestManagement/RequestManagement.Api/RequestManagement.Api.csproj"
+COPY ["src/Services/RequestManagement/RequestManagement.Api/", "src/Services/RequestManagement/RequestManagement.Api/"]
+COPY ["src/Services/RequestManagement/RequestManagement.Application/", "src/Services/RequestManagement/RequestManagement.Application/"]
+COPY ["src/Services/RequestManagement/RequestManagement.Domain/", "src/Services/RequestManagement/RequestManagement.Domain/"]
+COPY ["src/Services/RequestManagement/RequestManagement.Infrastructure/", "src/Services/RequestManagement/RequestManagement.Infrastructure/"]
+RUN dotnet build "src/Services/RequestManagement/RequestManagement.Api/RequestManagement.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "RequestManagement.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "src/Services/RequestManagement/RequestManagement.Api/RequestManagement.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
