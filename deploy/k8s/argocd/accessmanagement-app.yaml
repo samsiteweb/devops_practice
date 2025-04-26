@@ -17,6 +17,9 @@ spec:
           value: "false"
         - name: serviceAccount.name
           value: "semanix-backend-accessmanagement"
+      image:
+             repository: samthedonz.azurecr.io/accessmanagementapi
+             tag: latest
   destination:
     server: https://kubernetes.default.svc
     namespace: semanix
