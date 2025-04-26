@@ -97,11 +97,16 @@ jobs:
         output: 'trivy-${{ matrix.service }}-results.sarif'
 
   update-helm-charts:
-    needs: build-and-push-docker
+    needs: scan-images
     runs-on: [self-hosted, azure]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
     - uses: actions/checkout@v3
+
+    - name: Setup Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: '3.11.0'
 
     - name: Package Helm charts
       run: |
