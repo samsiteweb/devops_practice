@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [ main ]
 
+# Add explicit permissions for GITHUB_TOKEN
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   build-and-test:
     runs-on: [self-hosted, azure]
@@ -121,22 +126,24 @@ jobs:
         password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
     - name: Login to Helm OCI Registry
-      run: |
-        helm registry login ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io \
-          --username ${{ secrets.AZURE_REGISTRY_USERNAME }} \
-          --password ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+      run: helm registry login ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io --username ${{ secrets.AZURE_REGISTRY_USERNAME }} --password ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
     - name: Push Helm charts to ACR OCI registry
       run: |
         helm push ./deploy/helm/releases/accessmanagement-*.tgz oci://${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/helm
         helm push ./deploy/helm/releases/requestmanagement-*.tgz oci://${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/helm
 
+
     - name: Commit and push changes
+      env:
+        REPO_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add ./deploy/helm/releases
         git commit -m "Update Helm charts" || echo "No changes to commit"
+        # Use authenticated HTTPS URL for push
+        git remote set-url origin https://x-access-token:${REPO_TOKEN}@github.com/${{ github.repository }}
         git push
 
   sync-argocd:
@@ -156,4 +163,4 @@ jobs:
     - name: Sync Argo CD Application
       run: |
         argocd app sync semanix-backend
-        argocd app wait semanix-backend --health --timeout 120s 
+        argocd app wait semanix-backend --health --timeout 120s
