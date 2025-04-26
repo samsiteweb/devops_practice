@@ -1,5 +1,4 @@
 replicaCount: 2
-
 image:
   repository: samthedonz.azurecr.io/requestmanagementapi
   pullPolicy: IfNotPresent
