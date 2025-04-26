@@ -35,8 +35,8 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       with:
         args: >
-          -Dsonar.projectKey=semantixbackend
-          -Dsonar.organization=semantixbackend
+          -Dsonar.projectKey=semanixbackend
+          -Dsonar.organization=semanixbackend
 
   build-and-push-docker:
     needs: build-and-test

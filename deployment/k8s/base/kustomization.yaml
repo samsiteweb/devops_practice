@@ -7,4 +7,4 @@ resources:
 - tracing.yaml
 - service-discovery.yaml
 
-namespace: semantix 
+namespace: semanix 

@@ -4,7 +4,7 @@ kind: Kustomization
 resources:
 - ../../base
 
-namespace: semantix-prod
+namespace: semanix-prod
 
 patches:
 - path: patches/resources.yaml 
