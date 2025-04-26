@@ -58,4 +58,7 @@ env:
   - name: ASPNETCORE_ENVIRONMENT
     value: "Development"
   - name: ASPNETCORE_URLS
-    value: "http://+:8080" 
+    value: "http://+:8080"
+
+imagePullSecrets:
+  - name: acr-pull-secret 
