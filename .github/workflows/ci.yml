@@ -51,9 +51,9 @@ jobs:
     - name: Login to Container Registry
       uses: docker/login-action@v2
       with:
-        registry: ${{ secrets.REGISTRY_URL }}
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
+        registry: ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io
+        username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
+        password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
     - name: Build and push AccessManagement API
       uses: docker/build-push-action@v4
@@ -61,7 +61,8 @@ jobs:
         context: ./SemanixBackend
         file: ./SemanixBackend/src/Services/AccessManagement/AccessManagement.Api/Dockerfile
         push: true
-        tags: ${{ secrets.REGISTRY_URL }}/accessmanagementapi:latest
+        tags: |
+          ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/accessmanagementapi:latest
 
     - name: Build and push RequestManagement API
       uses: docker/build-push-action@v4
@@ -69,7 +70,8 @@ jobs:
         context: ./SemanixBackend
         file: ./SemanixBackend/src/Services/RequestManagement/RequestManagement.Api/Dockerfile
         push: true
-        tags: ${{ secrets.REGISTRY_URL }}/requestmanagementapi:latest
+        tags: |
+          ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/requestmanagementapi:latest
 
     - name: Scan Docker Images for vulnerabilities
       uses: aquasecurity/trivy-action@master
@@ -87,8 +89,11 @@ jobs:
 
     - name: Package Helm charts
       run: |
-        helm package ./deployment/helm/charts/accessmanagement -d ./deployment/helm/releases
-        helm package ./deployment/helm/charts/requestmanagement -d ./deployment/helm/releases
+        helm package ./helm/charts/accessmanagement -d ./helm/releases
+        helm package ./helm/charts/requestmanagement -d ./helm/releases
+        az acr login --name ${{ secrets.AZURE_REGISTRY_NAME }}
+        helm push ./helm/releases/accessmanagement-*.tgz oci://
+        helm push ./helm/releases/requestmanagement-*.tgz oci://
 
     - name: Commit and push changes
       run: |
@@ -97,3 +102,22 @@ jobs:
         git add ./deploy/helm/releases
         git commit -m "Update Helm charts" || echo "No changes to commit"
         git push 
+
+  sync-argocd:
+    needs: update-helm-charts
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install Argo CD CLI
+      run: |
+        curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+        chmod +x argocd
+        sudo mv argocd /usr/local/bin
+
+    - name: Argo CD Login
+      run: |
+        argocd login ${{ secrets.ARGOCD_SERVER }} --username ${{ secrets.ARGOCD_USER }} --password ${{ secrets.ARGOCD_PASSWORD }} --insecure
+
+    - name: Sync Argo CD Application
+      run: |
+        argocd app sync semanix-backend
+        argocd app wait semanix-backend --health --timeout 120s 
