@@ -61,4 +61,4 @@ env:
     value: "http://+:8080"
 
 imagePullSecrets:
-  - name: acr-pull-secret 
+  - name: acr-auth
