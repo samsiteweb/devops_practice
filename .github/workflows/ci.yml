@@ -87,6 +87,8 @@ jobs:
         image-ref: ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/${{ matrix.service }}:latest
         format: 'sarif'
         output: 'trivy-${{ matrix.service }}-results.sarif'
+        username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
+        password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
   update-helm-charts:
     needs: build-and-push-docker
