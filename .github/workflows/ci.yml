@@ -79,7 +79,7 @@ jobs:
           ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/requestmanagementapi:latest
 
   update-helm-charts:
-    needs: build-and-test
+    needs: build-and-push-docker
     runs-on: [self-hosted, azure]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
