@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: samthedonz.azurecr.io/requestmanagementapi
+  repository: samthedonz.azurecr.io/requestmanagementapi:latest
   pullPolicy: IfNotPresent
   tag: "latest"
 
