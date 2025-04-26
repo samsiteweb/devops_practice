@@ -73,12 +73,20 @@ jobs:
         tags: |
           ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/requestmanagementapi:latest
 
-    - name: Scan Docker Images for vulnerabilities
+    # Security scan both service images in parallel via matrix
+  scan-images:
+    needs: build-and-push-docker
+    runs-on: [self-hosted, azure]
+    strategy:
+      matrix:
+        service: [accessmanagementapi, requestmanagementapi]
+    steps:
+    - name: Scan ${{ matrix.service }} image for vulnerabilities
       uses: aquasecurity/trivy-action@master
       with:
-        image-ref: ${{ secrets.REGISTRY_URL }}/accessmanagementapi:latest
+        image-ref: ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/${{ matrix.service }}:latest
         format: 'sarif'
-        output: 'trivy-results.sarif'
+        output: 'trivy-${{ matrix.service }}-results.sarif'
 
   update-helm-charts:
     needs: build-and-push-docker
