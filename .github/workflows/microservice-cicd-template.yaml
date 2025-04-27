@@ -135,7 +135,8 @@ jobs:
         export CHART_VERSION=${{ needs.setup.outputs.chart_version }}
         export DOCKER_TAG=${{ needs.setup.outputs.docker_tag }}
 
-        envsubst '${AZURE_REGISTRY_NAME} ${CHART_VERSION} ${DOCKER_TAG}' < ./deploy/k8s/argocd/accessmanagement-app.yaml > app-final.yaml
+        # Render the specified ArgoCD app file
+        envsubst '$AZURE_REGISTRY_NAME $CHART_VERSION $DOCKER_TAG' < ${{ inputs.argocd_app_file }} > app-final.yaml
 
         sudo argocd app create -f app-final.yaml --upsert
 
