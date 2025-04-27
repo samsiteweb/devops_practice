@@ -14,7 +14,7 @@ namespace RequestManagement.Api;
 
 public class Program
 {
-    //test build update 1
+    //test build update 2
     public static void Main(string[] args)
     {
         using var logger = new LoggerConfiguration()

@@ -1,21 +1,21 @@
-name: RequestManagement Deployment
+name: RequestManagement CI
 
 on:
   push:
+    branches: [ main ]
     paths:
       - 'SemanixBackend/src/Services/RequestManagement/**'
-      - 'deploy/helm/charts/requestmanagement/**'
-      - 'deploy/k8s/argocd/requestmanagement-app.yaml'
-    branches: [ main ]
+      - '.github/workflows/requestmanagement-cicd.yaml'
+      - '.github/workflows/microservice-ci-template.yaml'
 
 jobs:
-  deploy:
-    uses: ./.github/workflows/microservice-cicd-template.yaml
+  build-and-push:
+    uses: ./.github/workflows/microservice-ci-template.yaml
     with:
-      service_name: requestmanagement
-      docker_context: ./SemanixBackend
-      dockerfile_path: ./SemanixBackend/src/Services/RequestManagement/RequestManagement.Api/Dockerfile
-      helm_chart_path: ./deploy/helm/charts/requestmanagement
-      helm_chart_name: requestmanagement
-      argocd_app_file: ./deploy/k8s/argocd/requestmanagement-app.yaml
-    secrets: inherit
+      service_name: 'requestmanagement'
+      docker_context: 'SemanixBackend'
+      dockerfile_path: 'SemanixBackend/src/Services/RequestManagement/RequestManagement.Api/Dockerfile'
+    secrets:
+      AZURE_REGISTRY_NAME: ${{ secrets.AZURE_REGISTRY_NAME }}
+      AZURE_REGISTRY_USERNAME: ${{ secrets.AZURE_REGISTRY_USERNAME }}
+      AZURE_REGISTRY_PASSWORD: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
