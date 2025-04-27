@@ -1,0 +1,21 @@
+name: RequestManagement Deployment
+
+on:
+  push:
+    paths:
+      - 'SemanixBackend/src/Services/RequestManagement/**'
+      - 'deploy/helm/charts/requestmanagement/**'
+      - 'deploy/k8s/argocd/requestmanagement-app.yaml'
+    branches: [ main ]
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/microservice-cicd-template.yaml
+    with:
+      service_name: requestmanagement
+      docker_context: ./SemanixBackend
+      dockerfile_path: ./SemanixBackend/src/Services/RequestManagement/RequestManagement.Api/Dockerfile
+      helm_chart_path: ./deploy/helm/charts/requestmanagement
+      helm_chart_name: requestmanagement
+      argocd_app_file: ./deploy/k8s/argocd/requestmanagement-app.yaml
+    secrets: inherit
