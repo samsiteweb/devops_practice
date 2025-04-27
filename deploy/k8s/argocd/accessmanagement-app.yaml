@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: "oci://${AZURE_REGISTRY_NAME}.azurecr.io/helm"
+    repoURL: "${AZURE_REGISTRY_NAME}.azurecr.io/helm"
     targetRevision: ${CHART_VERSION}
     chart: accessmanagement
     helm:
