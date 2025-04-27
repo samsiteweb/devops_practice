@@ -117,7 +117,7 @@ jobs:
         helm package ./deploy/helm/charts/accessmanagement -d ./deploy/helm/releases
         helm package ./deploy/helm/charts/requestmanagement -d ./deploy/helm/releases
 
-        helm push ./deploy/helm/releases/accessmanagement-${{ needs.setup.outputs.accessmngt_version }}.tgz oci://${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/${{ env.AZURE_REGISTRY_HELM_PATH}
+        helm push ./deploy/helm/releases/accessmanagement-${{ needs.setup.outputs.accessmngt_version }}.tgz oci://${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/${{ env.AZURE_REGISTRY_HELM_PATH }}
         helm push ./deploy/helm/releases/requestmanagement-${{ needs.setup.outputs.requestmngt_version }}.tgz oci://${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/${{ env.AZURE_REGISTRY_HELM_PATH }}
 
     - name: Commit updated Helm chart releases
