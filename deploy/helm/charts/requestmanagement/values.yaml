@@ -61,3 +61,9 @@ env:
 
 imagePullSecrets:
   - name: acr-pull-secret
+
+dapr:
+  enabled: true
+  appId: requestmanagement
+  appPort: 8090
+  config: dapr-config

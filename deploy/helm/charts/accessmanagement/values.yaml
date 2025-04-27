@@ -23,7 +23,6 @@ service:
   type: NodePort
   port: 8080
 
-
 ingress:
   enabled: false
   className: ""
@@ -62,4 +61,10 @@ env:
     value: "http://+:8080"
 
 imagePullSecrets:
-  - name: acr-pull-secret 
+  - name: acr-pull-secret
+
+dapr:
+  enabled: true
+  appId: accessmanagement
+  appPort: 8080
+  config: dapr-config
