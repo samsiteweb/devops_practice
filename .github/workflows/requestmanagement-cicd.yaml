@@ -2,7 +2,7 @@ name: RequestManagement CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ ci ]
     paths:
       - 'SemanixBackend/src/Services/RequestManagement/**'
       - '.github/workflows/requestmanagement-cicd.yaml'

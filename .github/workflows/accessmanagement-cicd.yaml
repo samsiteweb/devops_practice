@@ -2,7 +2,7 @@ name: AccessManagement CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ ci ]
     paths:
       - 'SemanixBackend/src/Services/AccessManagement/**'
       - '.github/workflows/accessmanagement-cicd.yaml'
