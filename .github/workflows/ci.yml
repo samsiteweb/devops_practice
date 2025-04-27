@@ -21,6 +21,7 @@ jobs:
     outputs:
       accessmngt_version: ${{ steps.read_versions.outputs.accessmngt_version }}
       requestmngt_version: ${{ steps.read_versions.outputs.requestmngt_version }}
+      docker_tag: ${{ steps.set_docker_tag.outputs.docker_tag }}
     steps:
     - uses: actions/checkout@v3
 
@@ -29,6 +30,12 @@ jobs:
       run: |
         echo "accessmngt_version=$(grep '^version:' $ACCESSMNGT_CHART_PATH | awk '{print $2}')" >> $GITHUB_OUTPUT
         echo "requestmngt_version=$(grep '^version:' $REQUESTMNGT_CHART_PATH | awk '{print $2}')" >> $GITHUB_OUTPUT
+
+    - name: Set Docker Tag (based on short SHA)
+      id: set_docker_tag
+      run: |
+        DOCKER_TAG=$(echo "${GITHUB_SHA}" | cut -c1-7)
+        echo "docker_tag=$DOCKER_TAG" >> $GITHUB_OUTPUT
 
   build-and-test:
     needs: setup
@@ -75,7 +82,7 @@ jobs:
         file: ./SemanixBackend/src/Services/AccessManagement/AccessManagement.Api/Dockerfile
         push: true
         tags: |
-          ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/accessmanagementapi:latest
+          ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/accessmanagementapi:${{ needs.setup.outputs.docker_tag }}
 
     - name: Build and push RequestManagement API
       uses: docker/build-push-action@v4
@@ -84,7 +91,7 @@ jobs:
         file: ./SemanixBackend/src/Services/RequestManagement/RequestManagement.Api/Dockerfile
         push: true
         tags: |
-          ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/requestmanagementapi:latest
+          ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/requestmanagementapi:${{ needs.setup.outputs.docker_tag }}
 
   update-helm-charts:
     needs: [setup, build-and-push-docker]
@@ -97,6 +104,11 @@ jobs:
       with:
         version: '3.11.0'
 
+    - name: Update image.tag dynamically in Helm values.yaml
+      run: |
+        sed -i "s|tag:.*|tag: \"${{ needs.setup.outputs.docker_tag }}\"|g" ./deploy/helm/charts/accessmanagement/values.yaml
+        sed -i "s|tag:.*|tag: \"${{ needs.setup.outputs.docker_tag }}\"|g" ./deploy/helm/charts/requestmanagement/values.yaml
+
     - name: Login to Helm OCI Registry
       run: helm registry login ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io --username ${{ secrets.AZURE_REGISTRY_USERNAME }} --password ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
@@ -105,17 +117,17 @@ jobs:
         helm package ./deploy/helm/charts/accessmanagement -d ./deploy/helm/releases
         helm package ./deploy/helm/charts/requestmanagement -d ./deploy/helm/releases
 
-        helm push ./deploy/helm/releases/accessmanagement-${{ needs.setup.outputs.accessmngt_version }}.tgz oci://${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/${{ env.AZURE_REGISTRY_HELM_PATH }}
+        helm push ./deploy/helm/releases/accessmanagement-${{ needs.setup.outputs.accessmngt_version }}.tgz oci://${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/${{ env.AZURE_REGISTRY_HELM_PATH}
         helm push ./deploy/helm/releases/requestmanagement-${{ needs.setup.outputs.requestmngt_version }}.tgz oci://${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/${{ env.AZURE_REGISTRY_HELM_PATH }}
 
-    - name: Commit Helm chart releases
+    - name: Commit updated Helm chart releases
       env:
         REPO_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add ./deploy/helm/releases
-        git commit -m "Update Helm charts" || echo "No changes to commit"
+        git add ./deploy/helm/charts/accessmanagement/values.yaml ./deploy/helm/charts/requestmanagement/values.yaml ./deploy/helm/releases
+        git commit -m "Update Docker image tags and Helm charts" || echo "No changes to commit"
         git remote set-url origin https://x-access-token:${REPO_TOKEN}@github.com/${{ github.repository }}
         git push
 
@@ -140,6 +152,7 @@ jobs:
         export AZURE_REGISTRY_NAME=${{ secrets.AZURE_REGISTRY_NAME }}
         export ACCESSMNGT_VERSION=${{ needs.setup.outputs.accessmngt_version }}
         export REQUESTMNGT_VERSION=${{ needs.setup.outputs.requestmngt_version }}
+        export DOCKER_TAG=${{ needs.setup.outputs.docker_tag }}
 
         envsubst < ./deploy/k8s/argocd/accessmanagement-app.yaml > accessmanagement-app-final.yaml
         envsubst < ./deploy/k8s/argocd/requestmanagement-app.yaml > requestmanagement-app-final.yaml

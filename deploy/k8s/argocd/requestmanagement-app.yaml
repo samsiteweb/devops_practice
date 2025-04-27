@@ -20,7 +20,7 @@ spec:
         - name: image.repository
           value: samthedonz.azurecr.io/requestmanagementapi
         - name: image.tag
-          value: latest
+          value: ${DOCKER_TAG}
       values: |
         dapr:
           enabled: true
