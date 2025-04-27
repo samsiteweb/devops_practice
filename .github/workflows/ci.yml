@@ -11,12 +11,28 @@ permissions:
   packages: write
 
 env:
-  ACCESSMNGT_CHART_PATH: ./deploy/helm/charts/accessmanagement/Chart.yaml
-  REQUESTMNGT_CHART_PATH: ./deploy/helm/charts/requestmanagement/Chart.yaml
   AZURE_REGISTRY_HELM_PATH: helm
 
 jobs:
+  setup:
+    name: Setup - Read Chart Versions
+    runs-on: [self-hosted, azure]
+    outputs:
+      accessmngt_version: ${{ steps.read_versions.outputs.accessmngt_version }}
+      requestmngt_version: ${{ steps.read_versions.outputs.requestmngt_version }}
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Read Helm Chart Versions
+      id: read_versions
+      run: |
+        ACCESSMNGT_VERSION=$(grep '^version:' ./deploy/helm/charts/accessmanagement/Chart.yaml | awk '{print $2}')
+        REQUESTMNGT_VERSION=$(grep '^version:' ./deploy/helm/charts/requestmanagement/Chart.yaml | awk '{print $2}')
+        echo "accessmngt_version=$ACCESSMNGT_VERSION" >> $GITHUB_OUTPUT
+        echo "requestmngt_version=$REQUESTMNGT_VERSION" >> $GITHUB_OUTPUT
+
   build-and-test:
+    needs: setup
     runs-on: [self-hosted, azure]
     steps:
     - uses: actions/checkout@v3
@@ -38,7 +54,7 @@ jobs:
       run: dotnet test SemanixBackend/SemanixBackend.sln --configuration Release --no-build
 
   build-and-push-docker:
-    needs: build-and-test
+    needs: [setup, build-and-test]
     runs-on: [self-hosted, azure]
     steps:
     - uses: actions/checkout@v3
@@ -72,7 +88,7 @@ jobs:
           ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/requestmanagementapi:latest
 
   update-helm-charts:
-    needs: build-and-push-docker
+    needs: [setup, build-and-push-docker]
     runs-on: [self-hosted, azure]
     steps:
     - uses: actions/checkout@v3
@@ -82,12 +98,6 @@ jobs:
       with:
         version: '3.11.0'
 
-    - name: Read Helm Chart Versions
-      id: read_versions
-      run: |
-        echo "ACCESSMNGT_VERSION=$(grep '^version:' $ACCESSMNGT_CHART_PATH | awk '{print $2}')" >> $GITHUB_ENV
-        echo "REQUESTMNGT_VERSION=$(grep '^version:' $REQUESTMNGT_CHART_PATH | awk '{print $2}')" >> $GITHUB_ENV
-
     - name: Package Helm charts
       run: |
         helm package ./deploy/helm/charts/accessmanagement -d ./deploy/helm/releases
@@ -96,12 +106,12 @@ jobs:
     - name: Login to Helm OCI Registry
       run: helm registry login ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io --username ${{ secrets.AZURE_REGISTRY_USERNAME }} --password ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
-    - name: Push Helm charts
+    - name: Push Helm charts to ACR
       run: |
-        helm push ./deploy/helm/releases/accessmanagement-${ACCESSMNGT_VERSION}.tgz oci://${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/${AZURE_REGISTRY_HELM_PATH}
-        helm push ./deploy/helm/releases/requestmanagement-${REQUESTMNGT_VERSION}.tgz oci://${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/${AZURE_REGISTRY_HELM_PATH}
+        helm push ./deploy/helm/releases/accessmanagement-${{ needs.setup.outputs.accessmngt_version }}.tgz oci://${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/${AZURE_REGISTRY_HELM_PATH}
+        helm push ./deploy/helm/releases/requestmanagement-${{ needs.setup.outputs.requestmngt_version }}.tgz oci://${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/${AZURE_REGISTRY_HELM_PATH}
 
-    - name: Commit Helm chart release packages
+    - name: Commit Helm releases
       env:
         REPO_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
       run: |
@@ -113,7 +123,7 @@ jobs:
         git push
 
   sync-argocd:
-    needs: [update-helm-charts]
+    needs: [setup, update-helm-charts]
     runs-on: [self-hosted, azure]
     steps:
     - uses: actions/checkout@v3
@@ -133,15 +143,15 @@ jobs:
     - name: Create and Sync Applications
       run: |
         export AZURE_REGISTRY_NAME=${{ secrets.AZURE_REGISTRY_NAME }}
-        export ACCESSMNGT_VERSION=${{ env.ACCESSMNGT_VERSION }}
-        export REQUESTMNGT_VERSION=${{ env.REQUESTMNGT_VERSION }}
+        export ACCESSMNGT_VERSION=${{ needs.setup.outputs.accessmngt_version }}
+        export REQUESTMNGT_VERSION=${{ needs.setup.outputs.requestmngt_version }}
         
         envsubst < ./deploy/k8s/argocd/accessmanagement-app.yaml > accessmanagement-app-final.yaml
         envsubst < ./deploy/k8s/argocd/requestmanagement-app.yaml > requestmanagement-app-final.yaml
 
         sudo argocd app create -f accessmanagement-app-final.yaml --upsert
         sudo argocd app create -f requestmanagement-app-final.yaml --upsert
-        
+
         sudo argocd app sync semanix-backend-accessmanagement
         sudo argocd app wait semanix-backend-accessmanagement --health --timeout 180
 
