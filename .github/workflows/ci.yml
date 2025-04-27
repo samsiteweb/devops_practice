@@ -60,7 +60,7 @@ jobs:
       run: dotnet test SemanixBackend/SemanixBackend.sln --configuration Release --no-build
 
   build-and-push-docker:
-    needs: build-and-test
+    needs: [setup, build-and-test]
     runs-on: [self-hosted, azure]
     steps:
     - uses: actions/checkout@v3
