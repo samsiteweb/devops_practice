@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: samthedonz.azurecr.io/helm
-    targetRevision: ${ACCESSMNGT_VERSION}
+    targetRevision: ${CHART_VERSION}
     chart: accessmanagement
     helm:
       valueFiles:
