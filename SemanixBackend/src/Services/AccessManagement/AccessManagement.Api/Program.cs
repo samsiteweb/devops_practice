@@ -26,7 +26,6 @@ public class Program
         try
         {
             var builder = WebApplication.CreateBuilder(args);
-
             // Add services to the container.
             builder.Host.UseSerilog((context, services, configuration) => configuration
                 .ReadFrom.Configuration(context.Configuration)
