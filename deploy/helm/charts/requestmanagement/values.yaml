@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: samthedonz.azurecr.io/requestmanagementapi
   pullPolicy: IfNotPresent
-  tag: "901826e"
+  tag: "latest"
 
 nameOverride: ""
 fullnameOverride: ""
