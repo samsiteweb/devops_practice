@@ -11,6 +11,11 @@ spec:
   selector:
     matchLabels:
       {{- include "accessmanagement.selectorLabels" . | nindent 6 }}
+  {{- with .Values.deployment.strategy }}
+  strategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  revisionHistoryLimit: {{ .Values.deployment.revisionHistoryLimit | default 2 }}
   template:
     metadata:
       annotations:

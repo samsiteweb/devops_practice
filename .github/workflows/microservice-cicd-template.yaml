@@ -142,7 +142,44 @@ jobs:
 
         if ! sudo argocd app diff semanix-backend-${{ inputs.service_name }}; then
           echo "Changes detected, syncing..."
-          sudo argocd app sync semanix-backend-${{ inputs.service_name }}
+          
+          # Function to check if another operation is in progress
+          function is_operation_in_progress() {
+            sudo argocd app get semanix-backend-${{ inputs.service_name }} -o json | grep -q '"sync":\s*{\s*"status":\s*"Running"'
+            return $?
+          }
+          
+          # Wait until no operation is in progress (max 5 minutes)
+          MAX_ATTEMPTS=30
+          ATTEMPT=0
+          while is_operation_in_progress && [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+            echo "Another sync operation is in progress. Waiting 10 seconds... (Attempt $ATTEMPT/$MAX_ATTEMPTS)"
+            sleep 10
+            ATTEMPT=$((ATTEMPT+1))
+          done
+          
+          if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
+            echo "Timed out waiting for previous operation to complete."
+            exit 1
+          fi
+          
+          # Try sync with retries
+          MAX_SYNC_ATTEMPTS=3
+          SYNC_ATTEMPT=0
+          while [ $SYNC_ATTEMPT -lt $MAX_SYNC_ATTEMPTS ]; do
+            if sudo argocd app sync semanix-backend-${{ inputs.service_name }}; then
+              break
+            fi
+            SYNC_ATTEMPT=$((SYNC_ATTEMPT+1))
+            if [ $SYNC_ATTEMPT -lt $MAX_SYNC_ATTEMPTS ]; then
+              echo "Sync failed. Retrying in 10 seconds... (Attempt $SYNC_ATTEMPT/$MAX_SYNC_ATTEMPTS)"
+              sleep 10
+            else
+              echo "Failed to sync after $MAX_SYNC_ATTEMPTS attempts."
+              exit 1
+            fi
+          done
+          
           sudo argocd app wait semanix-backend-${{ inputs.service_name }} --health --timeout 180
         else
           echo "No changes detected, skipping sync."

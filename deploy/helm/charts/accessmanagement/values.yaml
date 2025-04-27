@@ -54,6 +54,15 @@ tolerations: []
 
 affinity: {}
 
+# Deployment strategy configuration
+deployment:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  revisionHistoryLimit: 2
+
 env:
   - name: ASPNETCORE_ENVIRONMENT
     value: "Development"
