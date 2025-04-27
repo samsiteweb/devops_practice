@@ -3,11 +3,10 @@ kind: Application
 metadata:
   name: semanix-backend-accessmanagement
   namespace: argocd
-  
 spec:
   project: default
   source:
-    repoURL: samthedonz.azurecr.io/helm
+    repoURL: oci://${AZURE_REGISTRY_NAME}.azurecr.io/helm
     targetRevision: 0.1.0
     chart: accessmanagement
     helm:
@@ -22,6 +21,12 @@ spec:
           value: samthedonz.azurecr.io/accessmanagementapi
         - name: image.tag
           value: latest
+      values: |
+        dapr:
+          enabled: true
+          appId: accessmanagement
+          appPort: 8080
+          config: dapr-config
   destination:
     server: https://kubernetes.default.svc
     namespace: semanix
