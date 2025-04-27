@@ -14,7 +14,7 @@ namespace AccessManagement.Api;
 
 public class Program
 {
-    //test build update 812
+    //test build update 12
     public static void Main(string[] args)
     {
         using var logger = new LoggerConfiguration()

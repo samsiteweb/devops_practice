@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: samthedonz.azurecr.io/helm
+    repoURL: "oci://${AZURE_REGISTRY_NAME}.azurecr.io/${AZURE_REGISTRY_HELM_PATH}"
     targetRevision: ${CHART_VERSION}
     chart: accessmanagement
     helm:
@@ -18,9 +18,9 @@ spec:
         - name: serviceAccount.name
           value: "semanix-backend-accessmanagement"
         - name: image.repository
-          value: samthedonz.azurecr.io/accessmanagementapi
+          value: "${AZURE_REGISTRY_NAME}.azurecr.io/accessmanagementapi"
         - name: image.tag
-          value: ${DOCKER_TAG}
+          value: "${DOCKER_TAG}"
       values: |
         dapr:
           enabled: true
