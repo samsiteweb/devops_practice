@@ -5,7 +5,7 @@ resources:
 - ../../base
 - ingress-infra.yaml
 
-namespace: semanix-dev
+namespace: semanix-uat
 
 patches:
 - path: patches/resources.yaml 

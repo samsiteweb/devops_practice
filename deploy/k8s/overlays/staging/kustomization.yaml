@@ -3,8 +3,9 @@ kind: Kustomization
 
 resources:
 - ../../base
+- ingress-infra.yaml
 
-namespace: semanix-prod
+namespace: semanix-staging
 
 patches:
 - path: patches/resources.yaml 
