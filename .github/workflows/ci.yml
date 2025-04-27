@@ -107,9 +107,9 @@ jobs:
 
     - name: Push Helm charts to ACR OCI registry
       run: |
-        helm push ./deploy/helm/releases/accessmanagement-*.tgz oci://${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/helm
-        helm push ./deploy/helm/releases/requestmanagement-*.tgz oci://${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/helm
-
+        helm push ./deploy/helm/releases/accessmanagement-*.tgz oci://${{ secrets.AZURE_REGISTRY_NAME }}/helm
+        helm push ./deploy/helm/releases/requestmanagement-*.tgz oci://${{ secrets.AZURE_REGISTRY_NAME }}/helm
+        
     - name: Commit and push changes
       env:
         REPO_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
