@@ -108,13 +108,13 @@ jobs:
 
     - name: Commit updated Helm and values.yaml
       env:
-        REPO_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+        REPO_ACCESS_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add ${{ inputs.helm_chart_path }}/values.yaml ./deploy/helm/releases
         git commit -m "Update ${{ inputs.service_name }} Docker tag and Helm chart" || echo "No changes to commit"
-        git remote set-url origin https://x-access-token:${REPO_TOKEN}@github.com/${{ github.repository }}
+        git remote set-url origin https://x-access-token:${REPO_ACCESS_TOKEN}@github.com/${{ github.repository }}
         git push
 
   sync-argocd:
