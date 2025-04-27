@@ -106,14 +106,14 @@ jobs:
         helm package ${{ inputs.helm_chart_path }} -d ./deploy/helm/releases
         helm push ./deploy/helm/releases/${{ inputs.helm_chart_name }}-${{ needs.setup.outputs.chart_version }}.tgz oci://${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/${{ env.AZURE_REGISTRY_HELM_PATH }}
 
-    - name: Commit updated Helm and values.yaml
+    - name: Commit updated Helm values.yaml
       env:
         REPO_ACCESS_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add ${{ inputs.helm_chart_path }}/values.yaml ./deploy/helm/releases
-        git commit -m "Update ${{ inputs.service_name }} Docker tag and Helm chart" || echo "No changes to commit"
+        git add ${{ inputs.helm_chart_path }}/values.yaml
+        git commit -m "chore: update Docker image tag for ${{ inputs.service_name }}" || echo "No changes to commit"
         git remote set-url origin https://x-access-token:${REPO_ACCESS_TOKEN}@github.com/${{ github.repository }}
         git push
 
