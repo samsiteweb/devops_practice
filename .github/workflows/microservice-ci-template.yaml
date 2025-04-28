@@ -26,11 +26,13 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     
-    - name: Set Docker tag
+    - name: Set Docker tag (auto generate)
       id: set_docker_tag
       run: |
-        SHORT_SHA=$(echo "${GITHUB_SHA}" | cut -c1-7)
-        echo "docker_tag=$SHORT_SHA" >> $GITHUB_OUTPUT
+        COMMIT_COUNT=$(git rev-list --count HEAD)
+        VERSION="0.1.${COMMIT_COUNT}"
+        echo "docker_tag=$VERSION" >> $GITHUB_OUTPUT
+        echo "Using version: $VERSION"
 
     - name: Setup Docker Buildx
       uses: docker/setup-buildx-action@v2
@@ -52,4 +54,4 @@ jobs:
           ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/${{ inputs.service_name }}api:${{ steps.set_docker_tag.outputs.docker_tag }}
           ${{ secrets.AZURE_REGISTRY_NAME }}.azurecr.io/${{ inputs.service_name }}api:latest
         build-args: |
-          BUILD_CONFIGURATION=Release 
+          BUILD_CONFIGURATION=Release
