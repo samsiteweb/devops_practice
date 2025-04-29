@@ -34,6 +34,7 @@ public static class HealthChecksConfiguration
             await context.Response.WriteAsync("Healthy");
         });
         
+        
         return endpoints;
     }
 }
