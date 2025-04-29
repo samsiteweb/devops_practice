@@ -30,7 +30,7 @@ jobs:
       id: set_docker_tag
       run: |
         COMMIT_COUNT=$(git rev-list --count HEAD)
-        VERSION="0.2.3${COMMIT_COUNT}"
+        VERSION="0.2.4${COMMIT_COUNT}"
         echo "docker_tag=$VERSION" >> $GITHUB_OUTPUT
         echo "Using version: $VERSION"
 

@@ -25,6 +25,14 @@ public static class HealthChecksConfiguration
             Predicate = _ => true,
             ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
         });
+        
+        // Additional health endpoint for Kubernetes probes
+        endpoints.MapHealthChecks("/health", new HealthCheckOptions
+        {
+            Predicate = _ => true,
+            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+        });
+        
         return endpoints;
     }
 }
