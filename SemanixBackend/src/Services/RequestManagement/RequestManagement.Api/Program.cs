@@ -31,7 +31,18 @@ public class Program
             builder.Host.UseSerilog((context, services, configuration) => configuration
                 .ReadFrom.Configuration(context.Configuration)
                 .ReadFrom.Services(services));
-            builder.Services.AddDaprSidekick(builder.Configuration);
+            
+            // Only add Dapr Sidekick if we're not running in Kubernetes
+            // This prevents errors when the sidecar is managed by Kubernetes
+            var isDaprEnabledInConfig = builder.Configuration.GetValue<bool>("Dapr:Enabled", false);
+            var isKubernetes = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("KUBERNETES_SERVICE_HOST"));
+            var shouldEnableDaprSidekick = isDaprEnabledInConfig && !isKubernetes;
+            
+            if (shouldEnableDaprSidekick)
+            {
+                logger.Write(LogEventLevel.Information, "Enabling Dapr Sidekick for local development");
+                builder.Services.AddDaprSidekick(builder.Configuration);
+            }
 
             builder.Services.AddControllers(
                 opt =>
@@ -42,8 +53,14 @@ public class Program
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-            })
-            .AddDapr();
+            });
+            
+            // Only add Dapr client if Dapr is enabled
+            if (isDaprEnabledInConfig)
+            {
+                builder.Services.AddControllers().AddDapr();
+            }
+            
             builder.Services.AddApplication(builder.Configuration);
             builder.Services.ConfigureApplicationSecurity(builder.Configuration);
             builder.Services.ConfigureHealthChecks(builder.Configuration);
